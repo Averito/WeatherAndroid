@@ -24,6 +24,8 @@ class HttpService {
     }
 
     private fun <T> request(url: String, method: Int, state: MutableState<T>, onResponse: (response: String) -> Unit) {
+        Log.d("Request", url)
+
         val request = StringRequest(method, "$_baseUrl$url",
             onResponse
         ) { error ->

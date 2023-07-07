@@ -42,7 +42,8 @@ fun FirstCard(
 
     ElevatedCard(modifier = Modifier
         .fillMaxWidth()
-        .fillMaxHeight(0.4f), shape = RoundedCornerShape(8.dp)
+        .fillMaxHeight(0.4f)
+        .padding(15.dp), shape = RoundedCornerShape(8.dp)
     ) {
         Box(modifier = Modifier.padding(15.dp)) {
             Column(modifier = Modifier.fillMaxHeight(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceBetween) {
