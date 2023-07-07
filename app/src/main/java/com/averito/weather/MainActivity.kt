@@ -63,6 +63,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MainScreen(httpService) { city ->
                 coordinates = city
+                requestLocationPermissions(this, requestPermissionLauncher)
                 getCurrentLocation(this, fusedLocationClient, requestPermissionLauncher, city)
             }
         }
@@ -78,10 +79,10 @@ private fun MainScreen(httpService: HttpService, updateLocation: (city: MutableS
 
     fun updateWeatherData() {
         getWeatherData(httpService, city.value, weather)
+        updateLocation(city)
     }
 
     updateWeatherData()
-    updateLocation(city)
 
     WeatherTheme(content = {
         Column(modifier = Modifier
@@ -130,7 +131,6 @@ private fun getWeatherData(httpService: HttpService, city: String, weather: Muta
 private fun getCurrentLocation(context: Context, fusedLocationClient: FusedLocationProviderClient, requestPermissionLauncher: ActivityResultLauncher<Array<String>>, state: MutableState<String>) {
     if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED &&
         ActivityCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED) {
-        requestPermissionLauncher.launch(arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION))
         return
     }
 
@@ -140,10 +140,17 @@ private fun getCurrentLocation(context: Context, fusedLocationClient: FusedLocat
     val currentLocation = fusedLocationClient.getCurrentLocation(locationRequest, token.token)
 
     currentLocation.addOnCompleteListener {
-        val coordinates = "${it.result.latitude.roundToInt()},${it.result.longitude.roundToInt()}"
+        val coordinates = "${it.result.latitude},${it.result.longitude}"
         state.value = coordinates
 
         Log.d("City", coordinates)
+    }
+}
+
+private fun requestLocationPermissions(context: Context, requestPermissionLauncher: ActivityResultLauncher<Array<String>>) {
+    if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED &&
+        ActivityCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED) {
+        requestPermissionLauncher.launch(arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION))
     }
 }
 
